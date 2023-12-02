@@ -1,0 +1,39 @@
+plugins {
+    id 'idea'
+    id 'java-library'
+}
+
+dependencyLocking {
+    lockAllConfigurations()
+    lockMode = LockMode.STRICT
+}
+
+configurations.all {
+    resolutionStrategy.capabilitiesResolution.withCapability('javax.persistence:javax.persistence-api') {
+        selectHighestVersion()
+    }
+}
+
+dependencies.components {
+    withModule('jakarta.persistence:jakarta.persistence-api') {
+        with {
+            allVariants {
+                withCapabilities {
+                    addCapability('javax.persistence', 'javax.persistence-api', id.version)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation enforcedPlatform(project(':platform'))
+    implementation project(':subproject')
+    api 'jakarta.persistence:jakarta.persistence-api'
+}
+
+java {
+    consistentResolution {
+        useCompileClasspathVersions()
+    }
+}
